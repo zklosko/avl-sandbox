@@ -1,4 +1,4 @@
-name: Publish to npm and GitHub Packages
+name: Publish to NPM
 
 on:
   release:
@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - run: npm install -g npm@latest   # NEW — trusted publishing needs npm CLI 11.5.1+
 
@@ -26,10 +26,3 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
-
-      - name: Publish to GitHub Packages
-        run: |
-          npm config set //npm.pkg.github.com/:_authToken=${GH_TOKEN}
-          npm publish --registry=https://npm.pkg.github.com
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
