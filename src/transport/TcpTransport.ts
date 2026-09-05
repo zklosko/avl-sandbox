@@ -20,7 +20,7 @@ class TcpClient implements TransportClient {
 }
 
 /**
- * Creates UDP server to listen to commands and respond
+ * Creates TCP server to listen to commands and respond
  */
 export class TcpTransport extends EventEmitter implements Transport {
     #server = net.createServer()
@@ -52,7 +52,7 @@ export class TcpTransport extends EventEmitter implements Transport {
     }
 
     /**
-     * Starts UDP server
+     * Starts TCP server
      */
     start(): Promise<void> {
         return new Promise((resolve) => {
@@ -70,6 +70,7 @@ export class TcpTransport extends EventEmitter implements Transport {
         })
     }
 
+    /** Returns port number for testing applications */
     get port(): number {
         const address = this.#server.address()
         if (address === null || typeof address === "string") throw new Error ("Socket is not bound")

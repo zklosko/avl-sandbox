@@ -80,6 +80,7 @@ export class UdpTransport extends EventEmitter implements Transport {
         })
     }
 
+    /** Returns port number for testing applications */
     get port(): number {
         const address = this.#socket.address()
 

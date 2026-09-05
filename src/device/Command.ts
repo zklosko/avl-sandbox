@@ -23,6 +23,7 @@ function parsePattern(pattern: string): ParsedPattern {
     }
 }
 
+/** Holds a command for the mock device to respond to */
 export class Command {
     #parsed: ParsedPattern
 

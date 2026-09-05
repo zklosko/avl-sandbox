@@ -1,3 +1,6 @@
+/**
+ * Base custom error class for AVL Sandbox
+ */
 export class AvlSandboxError extends Error {
     constructor(message: string) {
         super(message)
