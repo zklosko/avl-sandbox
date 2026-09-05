@@ -39,6 +39,11 @@ export class TcpTransport extends EventEmitter implements Transport {
                 this.emit("message", data.toString(), client)
             })
 
+            socket.on("error", (e) => {
+                console.error(`TCP client socket error: ${e.message}`)
+                this.#clients.delete(socket)
+            })
+
             socket.on("end", () => {
                 this.#clients.delete(socket)
                 console.log("TCP connected ended")

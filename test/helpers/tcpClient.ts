@@ -28,7 +28,15 @@ export class TestTcpClient {
 
     close(): Promise<void> {
         return new Promise((resolve) => {
+            if (this.#socket.destroyed) {
+                resolve()
+                return
+            }
             this.#socket.end(() => resolve())
         })
+    }
+
+    destroy(): void {
+        this.#socket.destroy()
     }
 }

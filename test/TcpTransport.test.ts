@@ -64,3 +64,22 @@ test("stop() closes server and rejects new connections", async () => {
         /ECONNREFUSED/
     )
 })
+
+test("handle abrupt client disconnect without crashing", async () => {
+    const messages: string[] = []
+    transport.on("message", (msg) => messages.push(msg))
+
+    client.send("HELLO")
+    await new Promise((r) => setTimeout(r, 50))  // let the message land
+
+    client.destroy()
+    await new Promise((r) => setTimeout(r, 50))  // give transport time to process the disconnect
+
+    const newClient = await TestTcpClient.connect(transport.port)
+    newClient.send("STILL ALIVE")
+    await new Promise((r) => setTimeout(r, 50))
+
+    assert.deepEqual(messages, ["HELLO", "STILL ALIVE"])
+
+    await newClient.close()
+})
