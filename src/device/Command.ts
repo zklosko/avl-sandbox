@@ -14,7 +14,7 @@ function parsePattern(pattern: string): ParsedPattern {
 
     const regexStr = pattern.replace(/\{(\w+):(\w+)\}/g, (_, name, type) => {
         paramTypes[name] = type as ParamType
-        return type === "number" ? `(-?\\d+(?:\\.\\d+)?)` : `(.+?)`
+        return `(.+?)`
     })
 
     return {
