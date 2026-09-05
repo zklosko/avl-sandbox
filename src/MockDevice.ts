@@ -1,11 +1,11 @@
-import { UdpTransport } from "./UdpTransport.js";
+import type { Transport, TransportClient } from "./transport/Transport.js";
 
 export class MockDevice {
     #state = new Map<string, unknown>()
     #commands = new Map<string,(device: MockDevice) => string | void>()
-    #transport: UdpTransport
+    #transport: Transport
 
-    constructor(transport: UdpTransport) {
+    constructor(transport: Transport) {
         this.#transport = transport
 
         this.#transport.on("message", (message, remote) => {
@@ -37,7 +37,7 @@ export class MockDevice {
         this.#transport.stop()
     }
 
-    #handleMessage(message: string, remote: {address: string, port: number}): void {
+    #handleMessage(message: string, client: TransportClient): void {
         const handler = this.#commands.get(message.trim())
 
         if (!handler) return
@@ -45,7 +45,7 @@ export class MockDevice {
         const response = handler(this) // ?
 
         if (response !== undefined) {
-            this.#transport.send(response, remote.port, remote.address)
+            client.send(response)
         }
     }
 }

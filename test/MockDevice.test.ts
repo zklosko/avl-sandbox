@@ -2,7 +2,7 @@ import { test, beforeEach, afterEach } from "node:test"
 import assert from "node:assert/strict"
 
 import { MockDevice } from "../src/MockDevice.js"
-import { UdpTransport } from "../src/UdpTransport.js"
+import { UdpTransport } from "../src/transport/UdpTransport.js"
 import { sendUdp } from "./helpers/udpClient.js"
 
 function createProjector() {
