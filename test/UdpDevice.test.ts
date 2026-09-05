@@ -1,7 +1,7 @@
 import { test, beforeEach, afterEach } from "node:test"
 import assert from "node:assert/strict"
 
-import { MockDevice } from "../src/MockDevice.js"
+import { MockDevice } from "../src/device/MockDevice.js"
 import { UdpTransport } from "../src/transport/UdpTransport.js"
 import { sendUdp } from "./helpers/udpClient.js"
 
