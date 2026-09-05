@@ -1,6 +1,6 @@
 {
   "name": "avl-sandbox",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A framework for creating mock networked A/V devices",
   "type": "module",
   "main": "./dist/index.js",
@@ -18,7 +18,8 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/index.ts",
     "test": "node --import tsx --test",
-    "check": "tsc -p tsconfig.test.json --noEmit"
+    "check": "tsc -p tsconfig.test.json --noEmit",
+    "format": "npx prettier . --write"
   },
   "engines": {
     "node": ">=22"
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "prettier": "3.9.6",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }
