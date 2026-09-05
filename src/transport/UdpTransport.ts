@@ -1,15 +1,32 @@
 import dgram from "node:dgram"
 import { EventEmitter } from "node:events"
+import type { Transport, TransportClient } from "./Transport.js";
 
 export interface UdpTransportOptions {
     port: number;
     host?: string;
 }
 
+class UdpClient implements TransportClient {
+    constructor(
+        private socket: dgram.Socket,
+        private port: number,
+        private address: string
+    ) {}
+
+    send(message: string): void {
+        this.socket.send(
+            Buffer.from(message),
+            this.port,
+            this.address
+        )
+    }
+}
+
 /**
  * Creates UDP server to listen to commands and respond
  */
-export class UdpTransport extends EventEmitter {
+export class UdpTransport extends EventEmitter implements Transport {
     #socket = dgram.createSocket("udp4")
     options: UdpTransportOptions
 
@@ -19,7 +36,13 @@ export class UdpTransport extends EventEmitter {
         this.options = options
 
         this.#socket.on("message", (message, remote) => {
-            this.emit("message", message.toString(), remote)
+            const client = new UdpClient(
+                this.#socket,
+                remote.port,
+                remote.address
+            )
+
+            this.emit("message", message.toString(), client)
         })
     }
 
@@ -51,8 +74,10 @@ export class UdpTransport extends EventEmitter {
     /**
      * Stops UDP server
      */
-    stop(): void {
-        this.#socket.close()
+    stop(): Promise<void> {
+        return new Promise((resolve) => {
+            this.#socket.close(() => resolve())
+        })
     }
 
     get port(): number {
