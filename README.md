@@ -18,7 +18,7 @@ It's not always practical to have a live device locally during driver developmen
 
 - Maintain internal state
 - Define parameters
-- Respond to commands locally or across the network via  UDP (TCP coming soonish)
+- Respond to commands locally or across the network via UDP (TCP coming soonish)
 - Behave like a real networked device from the perspective of your control system
 
 ## API
@@ -30,30 +30,30 @@ The MockDevice class represents a simulated networked device.
 **Example**
 
 ```ts
-import { MockDevice } from "avl-sandbox"
+import { MockDevice } from 'avl-sandbox';
 
 // Creates a mock device using the supplied transport
-const device = new MockDevice(transport)
+const device = new MockDevice(transport);
 
 // Define a piece of state for this device
-device.defineState("power", false)
-device.defineState("input", "HDMI1")
+device.defineState('power', false);
+device.defineState('input', 'HDMI1');
 
 // Update an existing state value
-device.setState("power", true)
+device.setState('power', true);
 
 // Get the current value of a state property
-const power = device.getState<boolean>("power")
+const power = device.getState<boolean>('power');
 
 // Define a command the device can respond to
-device.command("PWR ON", (device) => {
-    device.setState("power", true)
-    return "PWR ON"
-})
+device.command('PWR ON', (device) => {
+  device.setState('power', true);
+  return 'PWR ON';
+});
 
 // Start or stop the device and its transport
-await device.start()
-await device.stop()
+await device.start();
+await device.stop();
 ```
 
 **Constructor**
@@ -62,14 +62,14 @@ await device.stop()
 new MockDevice(transport: Transport): MockDevice
 ```
 
-| Method | Description |
-| --- | --- |
-| `defineState(name, initialValue)` | Defines a state property |
-| `setState(name, value)` | Updates a state property |
-| `getState<T>(name)` | Gets a state property |
-| `command(command, handler)` | Defines a command and response |
-| `start()` | Starts the device and transport |
-| `stop()` | Stops the device and transport |
+| Method                            | Description                     |
+| --------------------------------- | ------------------------------- |
+| `defineState(name, initialValue)` | Defines a state property        |
+| `setState(name, value)`           | Updates a state property        |
+| `getState<T>(name)`               | Gets a state property           |
+| `command(command, handler)`       | Defines a command and response  |
+| `start()`                         | Starts the device and transport |
+| `stop()`                          | Stops the device and transport  |
 
 The device owns its state and command definitions, while the transport handles network communication.
 
@@ -80,11 +80,11 @@ UdpTransport provides UDP network communication for a `MockDevice`.
 **Example**
 
 ```ts
-import { UdpTransport } from "avl-sandbox"
+import { UdpTransport } from 'avl-sandbox';
 
 const transport = new UdpTransport({
-    port: 4352
-})
+  port: 4352,
+});
 ```
 
 **Constructor**
@@ -93,37 +93,35 @@ const transport = new UdpTransport({
 new UdpTransport({ port: number }): UdpTransport
 ```
 
-| Method | Description |
-| --- | --- |
+| Method | Description               |
+| ------ | ------------------------- |
 | `port` | Gets the transport's port |
 
 ## Example: A Mock Projector
 
 ```ts
-import { MockDevice, UdpTransport } from "avl-sandbox";
+import { MockDevice, UdpTransport } from 'avl-sandbox';
 
-const projector = new MockDevice(
-    new UdpTransport({port: 4352})
-)
+const projector = new MockDevice(new UdpTransport({ port: 4352 }));
 
-projector.defineState("power", false)
+projector.defineState('power', false);
 
-projector.command("PWR ON", (device) => {
-    device.setState("power", true)
-    return "PWR ON"
-})
+projector.command('PWR ON', (device) => {
+  device.setState('power', true);
+  return 'PWR ON';
+});
 
-projector.command("PWR OFF", (device) => {
-    device.setState("power", false)
-    return "PWR OFF"
-})
+projector.command('PWR OFF', (device) => {
+  device.setState('power', false);
+  return 'PWR OFF';
+});
 
-projector.command("PWR?", (device) => {
-    return device.getState<boolean>("power") ? "PWR ON" : "PWR OFF"
-})
+projector.command('PWR?', (device) => {
+  return device.getState<boolean>('power') ? 'PWR ON' : 'PWR OFF';
+});
 
-await projector.start()
-console.log("Projector listening on UDP port 4352")
+await projector.start();
+console.log('Projector listening on UDP port 4352');
 ```
 
 Run the script and try sending commands to `127.0.0.1:4352`.
@@ -135,17 +133,17 @@ Commands can include typed parameters using `{name:type}` syntax. Supported type
 > For booleans: use a string for "true" or "false" and a number for 1 or 0.
 
 ```ts
-const mixer = new MockDevice(newUdpTransport({ port: 4353 }))
+const mixer = new MockDevice(newUdpTransport({ port: 4353 }));
 
-mixer.defineState("ch1_volume", 0)
-mixer.defineState("ch2_volume", 0)
+mixer.defineState('ch1_volume', 0);
+mixer.defineState('ch2_volume', 0);
 
-mixer.command("SET CH{channel:number} VOL {value:number}", (device, params) => {
-    device.setState(`ch ${params.channel} volume`, params.value)
-    return `OK CH${params.channel} VOL ${params.value}`
-})
+mixer.command('SET CH{channel:number} VOL {value:number}', (device, params) => {
+  device.setState(`ch ${params.channel} volume`, params.value);
+  return `OK CH${params.channel} VOL ${params.value}`;
+});
 
-await mixer.start()
+await mixer.start();
 ```
 
 Sending "SET CH1 VOL -10" updates ch1_volume and replies "OK CH1 VOL -10".
@@ -153,9 +151,9 @@ Sending "SET CH1 VOL -10" updates ch1_volume and replies "OK CH1 VOL -10".
 If no defined command matches an incomming message, the device emits error event `NoCommandMatchedError`.
 
 ```ts
-mixer.on("error", (error) => {
-    console.error(error.message)
-})
+mixer.on('error', (error) => {
+  console.error(error.message);
+});
 ```
 
 > **Note**: if multiple command patterns could match the same input, the first one registered wins.

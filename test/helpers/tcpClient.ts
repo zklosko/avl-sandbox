@@ -1,42 +1,42 @@
-import net from "node:net"
+import net from 'node:net';
 
 export class TestTcpClient {
-    #socket: net.Socket
+  #socket: net.Socket;
 
-    private constructor(socket: net.Socket) {
-        this.#socket = socket
-    }
+  private constructor(socket: net.Socket) {
+    this.#socket = socket;
+  }
 
-    static connect(port: number, host = "127.0.0.1"): Promise<TestTcpClient> {
-        return new Promise((resolve, reject) => {
-            const socket = net.connect(port, host)
-            socket.once("connect", () => resolve(new TestTcpClient(socket)))
-            socket.once("error", reject)
-        })
-    }
+  static connect(port: number, host = '127.0.0.1'): Promise<TestTcpClient> {
+    return new Promise((resolve, reject) => {
+      const socket = net.connect(port, host);
+      socket.once('connect', () => resolve(new TestTcpClient(socket)));
+      socket.once('error', reject);
+    });
+  }
 
-    send(message: string): void {
-        this.#socket.write(Buffer.from(message))
-    }
+  send(message: string): void {
+    this.#socket.write(Buffer.from(message));
+  }
 
-    waitForMessage(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            this.#socket.once("data", (data: Buffer) => resolve(data.toString()))
-            this.#socket.once("error", reject)
-        })
-    }
+  waitForMessage(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.#socket.once('data', (data: Buffer) => resolve(data.toString()));
+      this.#socket.once('error', reject);
+    });
+  }
 
-    close(): Promise<void> {
-        return new Promise((resolve) => {
-            if (this.#socket.destroyed) {
-                resolve()
-                return
-            }
-            this.#socket.end(() => resolve())
-        })
-    }
+  close(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.#socket.destroyed) {
+        resolve();
+        return;
+      }
+      this.#socket.end(() => resolve());
+    });
+  }
 
-    destroy(): void {
-        this.#socket.destroy()
-    }
+  destroy(): void {
+    this.#socket.destroy();
+  }
 }

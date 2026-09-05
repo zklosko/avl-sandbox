@@ -1,7 +1,7 @@
-import { AvlSandboxError } from "./AvlSandboxError.js";
+import { AvlSandboxError } from './AvlSandboxError.js';
 
 export class NoCommandMatchedError extends AvlSandboxError {
-    constructor(public readonly input: string) {
-        super(`No command matched input "${input}"`)
-    }
+  constructor(public readonly input: string) {
+    super(`No command matched input "${input}"`);
+  }
 }

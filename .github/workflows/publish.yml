@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write   # NEW — required for npm's OIDC trusted-publishing flow
+      id-token: write # NEW — required for npm's OIDC trusted-publishing flow
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
 
-      - run: npm install -g npm@latest   # NEW — trusted publishing needs npm CLI 11.5.1+
+      - run: npm install -g npm@latest # NEW — trusted publishing needs npm CLI 11.5.1+
 
       - run: npm ci
 
