@@ -1,0 +1,38 @@
+{
+  "name": "mockbench",
+  "version": "0.0.1",
+  "description": "A framework for creating mock networked A/V devices",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/index.ts",
+    "test": "node --import tsx --test",
+    "check": "tsc -p tsconfig.test.json --noEmit"
+  },
+  "keywords": [
+    "av",
+    "audio",
+    "video",
+    "udp",
+    "tcp",
+    "mock",
+    "testing"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}

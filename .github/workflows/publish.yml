@@ -1,0 +1,35 @@
+name: Publish to npm and GitHub Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write   # NEW — required for npm's OIDC trusted-publishing flow
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install -g npm@latest   # NEW — trusted publishing needs npm CLI 11.5.1+
+
+      - run: npm ci
+
+      - name: Publish to npm
+        run: npm publish --access public
+
+      - name: Publish to GitHub Packages
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken=${GH_TOKEN}
+          npm publish --registry=https://npm.pkg.github.com
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
