@@ -1,5 +1,5 @@
 {
-  "name": "mockbench",
+  "name": "avl-sandbox",
   "version": "0.0.1",
   "description": "A framework for creating mock networked A/V devices",
   "type": "module",
@@ -20,6 +20,16 @@
     "test": "node --import tsx --test",
     "check": "tsc -p tsconfig.test.json --noEmit"
   },
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zklosko/avl-sandbox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zklosko/avl-sandbox/issues"
+  },
   "keywords": [
     "av",
     "audio",
@@ -30,6 +40,9 @@
     "testing"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/node": "^26.4.1",
     "tsx": "^4.23.13",
