@@ -1,4 +1,4 @@
-import type { Command } from './Command.js';
+import type { Command } from '../device/Command.js';
 import type { Message } from './Message.js';
 
 /**
