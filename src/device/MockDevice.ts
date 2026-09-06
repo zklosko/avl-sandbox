@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { NoCommandMatchedError } from '../errors/NoCommandMatchedError.js';
-import { Message } from './Message.js';
-import { Response } from './Response.js';
+import { Message } from '../protocol/Message.js';
+import { Response } from '../protocol/Response.js';
 import type { Transport, TransportClient } from '../transport/Transport.js';
 import { Command } from './Command.js';
 
