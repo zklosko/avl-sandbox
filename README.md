@@ -18,7 +18,7 @@ It's not always practical to have a live device locally during driver developmen
 
 - Maintain internal state
 - Define parameters
-- Respond to commands locally or across the network via UDP (TCP coming soonish)
+- Respond to commands locally or across the network via UDP or TCP
 - Behave like a real networked device from the perspective of your control system
 
 ## API
@@ -97,34 +97,9 @@ new UdpTransport({ port: number }): UdpTransport
 | ------ | ------------------------- |
 | `port` | Gets the transport's port |
 
-## Example: A Mock Projector
+## Examples
 
-```ts
-import { MockDevice, UdpTransport } from 'avl-sandbox';
-
-const projector = new MockDevice(new UdpTransport({ port: 4352 }));
-
-projector.defineState('power', false);
-
-projector.command('PWR ON', (device) => {
-  device.setState('power', true);
-  return 'PWR ON';
-});
-
-projector.command('PWR OFF', (device) => {
-  device.setState('power', false);
-  return 'PWR OFF';
-});
-
-projector.command('PWR?', (device) => {
-  return device.getState<boolean>('power') ? 'PWR ON' : 'PWR OFF';
-});
-
-await projector.start();
-console.log('Projector listening on UDP port 4352');
-```
-
-Run the script and try sending commands to `127.0.0.1:4352`.
+Full examples are available in the examples folder on [GitHub](https://github.com/zklosko/avl-sandbox/tree/main/examples).
 
 ## Parameterized Commands
 
