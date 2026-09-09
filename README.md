@@ -62,14 +62,16 @@ await device.stop();
 new MockDevice(transport: Transport): MockDevice
 ```
 
-| Method                            | Description                     |
-| --------------------------------- | ------------------------------- |
-| `defineState(name, initialValue)` | Defines a state property        |
-| `setState(name, value)`           | Updates a state property        |
-| `getState<T>(name)`               | Gets a state property           |
-| `command(command, handler)`       | Defines a command and response  |
-| `start()`                         | Starts the device and transport |
-| `stop()`                          | Stops the device and transport  |
+| Method                             | Description                                                                        |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| `defineState(name, initialValue)`  | Defines a state property                                                           |
+| `setState(name, value)`            | Updates a state property                                                           |
+| `getState<T>(name)`                | Gets a state property                                                              |
+| `group(name, count, { template })` | Creates a group of state with the same properties (good for channels, zones, etc.) |
+| `at(name, index)`                  | Gets an individual state from a group                                              |
+| `command(command, handler)`        | Defines a command and response                                                     |
+| `start()`                          | Starts the device and transport                                                    |
+| `stop()`                           | Stops the device and transport                                                     |
 
 The device owns its state and command definitions, while the transport handles network communication.
 
@@ -132,3 +134,10 @@ mixer.on('error', (error) => {
 ```
 
 > **Note**: if multiple command patterns could match the same input, the first one registered wins.
+
+## Changelog
+
+### 0.2.0
+
+- Added the ability to declare groups of state in a single command, and nest groups as needed (good for channels, zones, etc.)
+- Groups have a 1-based index

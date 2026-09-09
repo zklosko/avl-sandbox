@@ -30,6 +30,14 @@ export class DeviceState implements StateContainer {
     this.#values.set(name, value);
   }
 
+  /**
+   * Creates a group of state, initialized using a provided template.
+   *
+   * This group has a 1-based index, so a count of 32 creates 32 states.
+   * @param name name of group
+   * @param count number of items in group
+   * @param template state template for each item, created using TS syntax `name: type`
+   */
   group(name: string, count: number, template: GroupTemplate): void {
     const entries = Array.from({ length: count }, () => {
       const entry = new DeviceState();
@@ -45,6 +53,14 @@ export class DeviceState implements StateContainer {
     this.#groups.set(name, entries);
   }
 
+  /**
+   * Returns an individual state from a group state, based on the provided index.
+   *
+   * This is 1-based, so `at("zone", 32)` returns zone 32's state.
+   * @param name name of group state
+   * @param index group index (1-based)
+   * @returns
+   */
   at(name: string, index: number): StateContainer {
     const entries = this.#groups.get(name);
     if (!entries) throw new NotAGroupError(name);
