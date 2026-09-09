@@ -49,7 +49,7 @@ export class DeviceState implements StateContainer {
     const entries = this.#groups.get(name);
     if (!entries) throw new NotAGroupError(name);
 
-    const entry = entries[index];
+    const entry = entries[index - 1];
     if (!entry) throw new IndexOutOfRangeError(name, index, entries.length);
 
     return entry;
