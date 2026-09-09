@@ -4,10 +4,11 @@ import { Message } from '../protocol/Message.js';
 import { Response } from '../protocol/Response.js';
 import type { Transport, TransportClient } from '../transport/Transport.js';
 import { Command } from './Command.js';
+import { DeviceState, type GroupTemplate, type StateContainer } from './DeviceState.js';
 
 /** Base class for building a mock device */
 export class MockDevice extends EventEmitter {
-  #state = new Map<string, unknown>();
+  #state = new DeviceState();
   #commands: Command[] = [];
   #transport: Transport;
 
@@ -24,7 +25,7 @@ export class MockDevice extends EventEmitter {
    * @param value initial value of parameter
    */
   defineState(name: string, value: unknown): void {
-    this.#state.set(name, value);
+    this.#state.defineState(name, value);
   }
 
   /**
@@ -33,7 +34,7 @@ export class MockDevice extends EventEmitter {
    * @returns current value of parameter
    */
   getState<T>(name: string): T {
-    return this.#state.get(name) as T;
+    return this.#state.getState(name) as T;
   }
 
   /**
@@ -44,7 +45,15 @@ export class MockDevice extends EventEmitter {
    * @param value new value of parameter
    */
   setState(name: string, value: unknown): void {
-    this.#state.set(name, value);
+    this.#state.setState(name, value);
+  }
+
+  group(name: string, count: number, template: GroupTemplate): void {
+    this.#state.group(name, count, template);
+  }
+
+  at(name: string, index: number): StateContainer {
+    return this.#state.at(name, index);
   }
 
   /**
