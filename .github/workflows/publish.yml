@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write # NEW — required for npm's OIDC trusted-publishing flow
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -20,9 +20,16 @@ jobs:
         with:
           node-version: '22'
 
-      - run: npm install -g npm@latest # NEW — trusted publishing needs npm CLI 11.5.1+
+      - run: npm install -g npm@latest
 
       - run: npm ci
 
       - name: Publish to npm
         run: npm publish --access public
+
+      - name: Publish to GitHub Packages
+        run: |
+          npm config set //npm.pkg.github.com/:_authToken=${GH_TOKEN}
+          npm publish --registry=https://npm.pkg.github.com
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
