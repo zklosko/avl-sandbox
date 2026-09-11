@@ -1,6 +1,7 @@
 import net from 'node:net';
 import { EventEmitter } from 'node:events';
 import type { Transport, TransportClient } from './Transport.js';
+import { LineFramer } from '../protocol/LineFramer.js';
 
 export interface TcpTransportOptions {
   port: number;
@@ -30,9 +31,13 @@ export class TcpTransport extends EventEmitter implements Transport {
     this.#server.on('connection', (socket: net.Socket) => {
       this.#clients.add(socket);
       const client = new TcpClient(socket);
+      const framer = new LineFramer();
 
       socket.on('data', (data: Buffer) => {
-        this.emit('message', data.toString(), client);
+        const frames = framer.push(data);
+        for (const f of frames) {
+          this.emit('message', f.toString(), client);
+        }
       });
 
       socket.on('error', (e) => {
