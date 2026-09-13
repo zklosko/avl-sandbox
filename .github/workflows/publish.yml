@@ -26,10 +26,3 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
-
-      - name: Publish to GitHub Packages
-        run: |
-          npm config set //npm.pkg.github.com/:_authToken=${GH_TOKEN}
-          npm publish --registry=https://npm.pkg.github.com
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
