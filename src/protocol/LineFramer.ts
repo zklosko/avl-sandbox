@@ -7,6 +7,9 @@ export interface LineFramerOptions {
 }
 
 /**
+ * Class for setting up line parsing for TCP connections.
+ * Handles removal of \r, \n, \r\n characters
+ *
  * Defaults to Telnet settings
  */
 export class LineFramer implements Framer {
