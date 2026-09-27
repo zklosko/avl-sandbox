@@ -1,8 +1,11 @@
 # AVL Sandbox
 
+> [!IMPORTANT]
+> AVL Sandbox's API may change before v1.0 is released
+
 A TypeScript framework for creating fake commercial A/V devices to use for plugin/driver development.
 
-> **Early development**: AVL Sandbox's API may change before v1.0 is released
+I once needed to develop a plugin for a lighting control server that had its commands documented but not the server's responses. I wound up creating a small server I could run on my computer with a 1:1 compatible API so I didn't need to VPN into my workplace to turn the lights on and off from miles away while testing the Bitfocus Companion module I was writing. Having this would have made that task so much easier.
 
 ## Installation
 
@@ -10,196 +13,13 @@ A TypeScript framework for creating fake commercial A/V devices to use for plugi
 
 Requires Node 22 or later.
 
-## Why AVL Sandbox?
+## Documentation
 
-I once needed to develop a plugin for a lighting control server that had its commands documented but not the server's responses. I wound up creating a small server I could run on my computer with a 1:1 compatible API so I didn't need to VPN into my workplace to turn the lights on and off from miles away while testing the Bitfocus Companion module I was writing.
-
-It's not always practical to have a live device locally during driver development. AVL Sandbox lets you create a lightweight software representation of a device that can:
-
-- Maintain internal state
-- Define parameters
-- Respond to commands locally or across the network via UDP or TCP
-- Behave like a real networked device from the perspective of your control system
-
-## API
-
-### Class MockDevice
-
-The MockDevice class represents a simulated networked device.
-
-**Example**
-
-```ts
-import { MockDevice } from 'avl-sandbox';
-
-// Creates a mock device using the supplied transport
-const device = new MockDevice(transport);
-
-// Define a piece of state for this device
-device.defineState('power', false);
-device.defineState('input', 'HDMI1');
-
-// Update an existing state value
-device.setState('power', true);
-
-// Get the current value of a state property
-const power = device.getState<boolean>('power');
-
-// Define a command the device can respond to
-device.command('PWR ON', (device) => {
-  device.setState('power', true);
-  return 'PWR ON';
-});
-
-// Start or stop the device and its transport
-await device.start();
-await device.stop();
-```
-
-**Constructor**
-
-```ts
-new MockDevice(transport: Transport): MockDevice
-```
-
-| Method                             | Description                                                                        |
-| ---------------------------------- | ---------------------------------------------------------------------------------- |
-| `defineState(name, initialValue)`  | Defines a state property                                                           |
-| `setState(name, value)`            | Updates a state property                                                           |
-| `getState<T>(name)`                | Gets a state property                                                              |
-| `group(name, count, { template })` | Creates a group of state with the same properties (good for channels, zones, etc.) |
-| `at(name, index)`                  | Gets an individual state from a group                                              |
-| `command(command, handler)`        | Defines a command and response                                                     |
-| `start()`                          | Starts the device and transport                                                    |
-| `stop()`                           | Stops the device and transport                                                     |
-
-The device owns its state and command definitions, while the transport handles network communication.
-
-### UdpTransport
-
-UdpTransport provides UDP network communication for a `MockDevice`.
-
-**Example**
-
-```ts
-import { UdpTransport } from 'avl-sandbox';
-
-const transport = new UdpTransport({
-  port: 4352,
-});
-```
-
-**Constructor**
-
-```ts
-new UdpTransport({ port: number }): UdpTransport
-```
-
-| Method | Description               |
-| ------ | ------------------------- |
-| `port` | Gets the transport's port |
+Documentation can be found in the [docs folder](/docs).
 
 ## Examples
 
 Full examples are available in the examples folder on [GitHub](https://github.com/zklosko/avl-sandbox/tree/main/examples).
-
-## Parameterized Commands
-
-Commands can include typed parameters using `{name:type}` syntax. Supported types are `string` and `number`. Matched values are parsed and passed to the handler as a `params` object.
-
-> For booleans: use a string for "true" or "false" and a number for 1 or 0.
-
-```ts
-const mixer = new MockDevice(newUdpTransport({ port: 4353 }));
-
-mixer.defineState('ch1_volume', 0);
-mixer.defineState('ch2_volume', 0);
-
-mixer.command('SET CH{channel:number} VOL {value:number}', (device, params) => {
-  device.setState(`ch ${params.channel} volume`, params.value);
-  return `OK CH${params.channel} VOL ${params.value}`;
-});
-
-await mixer.start();
-```
-
-Sending "SET CH1 VOL -10" updates ch1_volume and replies "OK CH1 VOL -10".
-
-If no defined command matches an incomming message, the device emits error event `NoCommandMatchedError`.
-
-```ts
-mixer.on('error', (error) => {
-  console.error(error.message);
-});
-```
-
-> **Note**: if multiple command patterns could match the same input, the first one registered wins.
-
-## Grouped State
-
-Some devices have many identically-shaped pieces of state — channels on a
-mixer, zones on a controller — where defining each one by hand
-(`ch1_volume`, `ch2_volume`, ...) isn't practical. `group()` defines a
-fixed-size collection of state in one call, and `at()` gets you a handle to
-one specific entry, with the same `getState`/`setState` API you already know.
-
-Indices are **1-based**, matching how real devices and their documentation
-usually number channels/zones (`CH1`, not `CH0`).
-
-```ts
-const mixer = new MockDevice(new UdpTransport({ port: 4353 }));
-
-mixer.group('channel', 32, { volume: 0, mute: false });
-
-mixer.command('SET CH{channel:number} VOL {value:number}', (device, params) => {
-  device.at('channel', params.channel).setState('volume', params.value);
-  return `OK CH${params.channel} VOL ${params.value}`;
-});
-
-await mixer.start();
-// "SET CH1 VOL -10" sets channel 1's volume and replies "OK CH1 VOL -10"
-```
-
-### Nested groups
-
-Groups can be nested arbitrarily deep by passing a builder function instead
-of a plain object as the template. The builder receives a container for that
-entry, which supports the same full API — including defining its own
-sub-groups.
-
-```ts
-const echo = new MockDevice(new UdpTransport({ port: 4352 }));
-
-echo.group('space', 16, (space) => {
-  space.defineState('preset', 0);
-  space.group('zone', 16, { power: false, level: 0 });
-  space.group('sequence', 4, { running: false });
-});
-
-// Reach any level by chaining at():
-echo.at('space', 2).at('zone', 3).setState('power', true);
-const preset = echo.at('space', 2).getState('preset');
-```
-
-### Errors
-
-Accessing a group incorrectly throws a specific, catchable error:
-
-- `NotAGroupError` — `at()` was called on a name that isn't a defined group
-- `IndexOutOfRangeError` — the index passed to `at()` is outside the group's
-  defined size
-- `UnknownStateError` — `getState`/`setState` was called with a name that
-  was never defined via `defineState`
-
-```ts
-try {
-  echo.at('space', 99);
-} catch (err) {
-  if (err instanceof IndexOutOfRangeError) {
-    console.error(err.message); // "Index 99 is out of range for group 'space' (valid range: 1-16)"
-  }
-}
-```
 
 ## Changelog
 
